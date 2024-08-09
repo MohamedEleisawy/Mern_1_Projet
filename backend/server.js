@@ -12,6 +12,7 @@
 
 import express from 'express';
 import { postRoutes } from './routes/postRoutes.js';
+import { userRoutes } from './routes/userRoutes.js'
 import mongoose from 'mongoose';
 // import {MonngoClient} from 'mongodb';
 // const PostModel = require("./mdels/PostModel.js");
@@ -20,6 +21,7 @@ const app = express();
 app.use(express.json()); // middleware to parse incoming requests with JSON payloads
 
 app.use('/api/posts', postRoutes);
+app.use('/api/user', userRoutes);
 
 mongoose.connect('mongodb://localhost:27017/', { dbName: 'Mern_Test'})
   .then(()=>{

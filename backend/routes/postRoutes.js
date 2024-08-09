@@ -1,8 +1,9 @@
 import express from 'express';
-import Post from '../models/PostModel.js';
-
+import { getPost, addPost, deletPost, updatePost} from '../controllers/postController.js';
 const router = express.Router();
 
+
+// import { get } from 'mongoose';
 // router.get('/about', (req, res) => {
 //     res.status(200).json({ message: 'Hello World' });
 // });
@@ -15,31 +16,13 @@ const router = express.Router();
 //     res.status(200).send('POST request');
 // });
 
-/* ################# Get All Posts #####################  */
-router.get('/',async (req,res)=>{
-    try{
-        const posts = await Post.find();
-        res.status(200).json(posts);
-    } catch(error){
-        res.status(500).json({error: error.message});
-    }
-})
-
-
-/* ################# Create New Post #####################  */
-
-router.post('/', async (req, res) => {
-    const { title, body } = req.body; // récupère les données du body
-    
-    if (!title || !body) {
-        return res.status(400).json({ error: 'Tout les champs sont requis' });
-    }
-    try{
-        const post = await Post.create({title , body}); // crée un nouveau post avec les données récupér
-        res.status(200).json({success: " Post created successfully"});
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
+// get all posts
+router.get("/", getPost); 
+// add new post
+router.post("/", addPost);
+// delete post route
+router.delete("/:id", deletPost);
+// update post route
+router.put("/:id", updatePost);
 
 export { router as postRoutes };

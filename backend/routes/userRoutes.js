@@ -7,7 +7,7 @@ const router = express.Router();
 router.post("/", registerUser);
 
 // Login user route
-router.post("/", loginUser);
+router.post("/login", loginUser);
 
 
 export { router as userRoutes };

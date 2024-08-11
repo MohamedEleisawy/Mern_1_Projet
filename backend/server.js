@@ -21,7 +21,7 @@ const app = express();
 app.use(express.json()); // middleware to parse incoming requests with JSON payloads
 
 app.use('/api/posts', postRoutes);
-app.use('/api/user', userRoutes);
+app.use('/api/user', userRoutes); 
 
 mongoose.connect('mongodb://localhost:27017/', { dbName: 'Mern_Test'})
   .then(()=>{

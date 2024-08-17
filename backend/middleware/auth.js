@@ -1,6 +1,6 @@
 // import  jwt
 import jwt from 'jsonwebtoken';
-import User from '../models/user.js';
+import User from '../models/UserModel.js';
 
 // req : représente la requête HTTP entrante.
 // res : représente la réponse HTTP que le serveur enverra.

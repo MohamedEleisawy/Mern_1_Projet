@@ -1,6 +1,7 @@
 // get all g
 import mongoose from "mongoose";
 import Post from "../models/PostModel.js";
+import User from "../models/UserModel.js";
 
 /* ################# Get All Posts #####################  */
 const getPost = async (req, res) => {
@@ -12,6 +13,17 @@ const getPost = async (req, res) => {
   }
 };
 
+
+/* ################# Get All Posts #####################  */
+const getUserPost = async (req, res) => {
+  const user = await User.findById(req.user._id);
+  try {
+    const userPosts = await Post.find({ user: user._id });
+    res.status(200).json({ userPosts });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 /* ################# Create New Post #####################  */
 const addPost = async (req, res) => {
   const { title, body } = req.body; // récupère les données du body
@@ -19,9 +31,11 @@ const addPost = async (req, res) => {
   if (!title || !body) {
     return res.status(400).json({ error: "Tout les champs sont requis" });
   }
+const user = await User.findById(req.user._id);
+
   try {
-    const post = await Post.create({ title, body }); // crée un nouveau post avec les données récupér
-    res.status(200).json({ success: " Post created successfully" });
+    const post = await Post.create({ user: user._id, title, body }); // crée un nouveau post avec les données récupér
+    res.status(200).json({ success: " Post created successfully", post });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -38,9 +52,13 @@ const deletPost = async (req, res) => {
   if (!post) {
     return res.status(400).json({ error: " Post not found " });
   }
+  const user = await User.findById(req.user._id);
+  if (!post.user.equals(user._id)) {
+    return res.status(400).json({ error: "You can't delete your own post" });
+  }
   try {
     await post.deleteOne(); // supprime le post
-    res.status(200).json({ success: "Post deleted successfully" });
+    res.status(200).json({ success: "Post deleted successfully" , post });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -52,7 +70,7 @@ const updatePost = async (req, res) => {
 
   // Vérification de la présence des données
   if (!title || !body) {
-    return res.status(400).json({ message: "Tous les champs sont requis !" }); // Réponse avec un statut 400 et un message JSON
+    return res.status(400).json({ message: "Tous les champs sont requis !" });
   }
 
   // Vérification de la validité de l'id
@@ -60,17 +78,25 @@ const updatePost = async (req, res) => {
     return res.status(400).json({ message: "ID invalide" });
   }
 
-  // Recherche du post par son id et mise à jour avec les nouvelles données
   try {
+    const user = await User.findById(req.user._id); // Trouve l'utilisateur connecté
+
+    const post = await Post.findById(req.params.id); // Recherche le post à mettre à jour
+    if (!post) {
+      return res.status(400).json({ message: "Post non trouvé" });
+    }
+
+    // Vérifie si l'utilisateur actuel est bien le propriétaire du post
+    if (!post.user.equals(user._id)) {
+      return res.status(400).json({ error: "Vous ne pouvez pas mettre à jour ce post" });
+    }
+
+    // Mise à jour du post
     const updatedPost = await Post.findByIdAndUpdate(
       req.params.id,
       { title, body },
       { new: true } // Option pour renvoyer le document mis à jour
     );
-
-    if (!updatedPost) {
-      return res.status(400).json({ message: "Post non trouvé" });
-    }
 
     res.status(200).json({ message: "Post modifié", post: updatedPost });
   } catch (error) {
@@ -78,5 +104,4 @@ const updatePost = async (req, res) => {
   }
 };
 
-
-export { getPost, addPost, deletPost, updatePost };
+export { getPost, addPost, getUserPost, deletPost, updatePost };

@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    .nav-link {
+        @apply w-10 h-10 rounded-md hover:bg-indigo-600 grid place-items-center ;
+  }
+}
+
